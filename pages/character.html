@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Character creation</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500&family=Nanum+Myeongjo&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Favicon -->
+    <link
+      rel="shortcut icon"
+      href="../assets/favicon.png"
+      type="image/x-icon"
+    />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/normalize.css" />
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <header>
+      <section>
+        <button id="navButton"><img src="../assets/nav.png" alt="Navigation icon"></button>
+        <!-- <button id="themeToggle"></button> Light/Dark theme toggle -->
+        <div id="navDiv" class="hide">
+          <aside id="navegation">
+            <a href="#" id="homeNav">Home</a> <!-- Home/Profile page -->
+            <a href="./pages/character.html">Character creation</a>
+            <a href="./pages/classes.html">Classes</a>
+            <a href="./pages/races.html">Races</a>
+            <a href="./pages/backgrounds.html">Backgrounds</a>
+            <a href="./pages/feats.html">Feats</a>
+            <a href="./pages/documents.html">Documents</a>
+          </aside>
+         </div>
+        <button id="signIn" class="fade">Sign In</button>
+      </section>
+    </header>
+
+    <main>
+      <section id="noUserChar" class="hide fade">
+        <h1>You have to Sign In to access character creation</h1>
+        <button id="signUp">Sign In</button>
+      </section>
+      <button id="start" class="hide">Start</button>
+      <section id="charCreate" class="hide fade">
+        <form id="charForm">
+          <label id="nameLabel" for="charName">Character's name</label>
+          <input type="text" id="charName" name="charName" required/>
+          <div id="classSelector">
+            <label for="charClass">Select class</label>
+            <select name="charClass" id="charClass"></select>
+            <img id="classPic" src="" alt="portrait">
+            <h2>STATS</h2>
+            <div id="classStats"></div>
+          </div>
+          <div id="raceSelector">
+            <label for="charRace">Select race</label>
+            <select name="charRace" id="charRace"></select>
+            <p id="raceDesc"></p>
+          </div>
+          <div id="backSelector">
+            <label for="charBack">Select background</label>
+            <select name="charBack" id="charBack"></select>
+            <p id="backDesc"></p>
+          </div>
+          <label for="favorite">Set as Main Character</label>
+          <input type="checkbox" name="favorite" id="favorite">
+          <input type="submit" id="submit" value="Submit">
+        </form>
+      </section>
+    </main>
+
+    <footer>
+      <section id="sourcesFooter">
+        <p>
+          Open-source info:
+          <a href="https://open5e.com/">https://open5e.com/</a>
+        </p>
+        <p>
+          API: <a href="https://api.open5e.com/">https://api.open5e.com/</a>
+        </p>
+      </section>
+      <section id="contact">
+        <p>GitHub: <a href="https://github.com/GREGORIOtsr">GREGORIOtsr</a></p>
+        <p>Email: GrAlfonsoTr@gmail.com</p>
+      </section>
+    </footer>
+
+    
+    <script src="../script.js" type="module"></script>
+  </body>
+</html>
