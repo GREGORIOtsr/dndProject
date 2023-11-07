@@ -100,8 +100,6 @@ async function googleSign() {
       // Handle Errors here.
       const errorCode = error.code;
       const errorMessage = error.message;
-      // The email of the user's account used.
-      const email = error.customData.email;
     });
 }
 
@@ -109,7 +107,7 @@ async function googleSign() {
 function signUserOut() {
   signOut(auth)
     .then(() => {
-      // alert("Sign-out successful");
+      window.location.reload();
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -124,14 +122,6 @@ function noUser() {
   signInButton.innerHTML = "Sign In";
   signInButton.addEventListener("click", googleSign);
   signUpButton.addEventListener("click", googleSign);
-  if (window.location.pathname === "/index.html") {
-    const home = document.getElementById('home');
-    home.classList.toggle('hide');
-  }
-  if (window.location.pathname === "/pages/character.html") {
-    const noUserChar = document.getElementById('noUserChar');
-    noUserChar.classList.toggle('hide')
-  }
 }
 
 // Change page if user logged
@@ -139,27 +129,15 @@ function userLogged() {
   const signInButton = document.getElementById("signIn");
   signInButton.innerHTML = "Sign Out";
   signInButton.addEventListener("click", signUserOut);
-  if (window.location.pathname === "/index.html") {
-    const profile = document.getElementById('profile');
-    profile.classList.toggle('hide');
-  }
-  if (window.location.pathname === "/pages/character.html") {
-    const start = document.getElementById('start');
-    start.classList.toggle('hide')
-  }
 }
 
 // Get classes urls from cloud storage
 const getPics = async function(arr) {
-  let classPics = [];
-  let classNames = [];
   await listAll(classPicsRef).then((res) => {
     res.items.forEach(async (item) => {
       let pic = await getDownloadURL(ref(classPicsRef, item.name));
-      classPics.push(pic);
-      classNames.push(item.name.replace(".png", "").toUpperCase());
+      arr.push({name: item.name.replace(".png", "").toUpperCase(), src: pic});
     });
-    arr.push(classPics, classNames);
   });
 }
 
@@ -175,7 +153,7 @@ const getStats = async function(arr) {
 // Set all characters as not favorite
 async function unFav() {
   await getDoc(currentUser).then(async (query) => {
-    let array = [query.data().characters];
+    let array = query.data().characters;
     for (let i = 0; i < array.length; i++) {
       array[i].favorite = false;
     }
@@ -185,60 +163,45 @@ async function unFav() {
   })
 }
 
-// Photo slider functions
-function showSlide(n) {
-  let i;
-  let slides = document.getElementsByClassName("slides");
-  let dots = document.getElementsByClassName("dot");
-  if (n > slides.length) {
-    slideIndex = 1;
-  }
-  if (n < 1) {
-    slideIndex = slides.length;
-  }
-  for (i = 0; i < slides.length; i++) {
-    slides[i].style.display = "none";
-  }
-  for (i = 0; i < dots.length; i++) {
-    dots[i].className = dots[i].className.replace(" active", "");
-  }
-  slides[slideIndex - 1].style.display = "block";
-  dots[slideIndex - 1].className += " active";
-}
+// Favorite character
 
-function changeSlide(n) {
-  showSlide((slideIndex += n));
-}
-
-function toSlide(n) {
-  showSlide((slideIndex = n));
-}
 
 // Insert class selector on html
-function setClassSelec(array1, array2) {
-  let slidePics = document.getElementById("slidePics");
-  let dotSelector = document.getElementById("dotSelector");
-  for (let i = 0; i < array1[0].length; i++) {
-    let obj = array2.find(arr => arr.name == array1[1][i])
-    slidePics.innerHTML += `<div class="slides fade">
-                            <label for="charClass"><img src="${array1[0][i]}" class="classSelec" alt="${array1[1][i]} portrait"></label>
-                            <input type="radio" name="charClass" style="display:none">
-                            <div>${array1[1][i]}</div>
-                            <h2>Base Stats</h2>
-                            <ul class="classStats">
-                            <li>Hit points: ${obj.stats.hp}</li>
-                            <li>Strenght: ${obj.stats.str}</li>
-                            <li>Constitution: ${obj.stats.con}</li>
-                            <li>Dextery: ${obj.stats.dex}</li>
-                            <li>Intelligence: ${obj.stats.int}</li>
-                            <li>Wisdom: ${obj.stats.wis}</li>
-                            <li>Charisma: ${obj.stats.cha}</li>
-                            </ul>
-                            </div>`;
-    dotSelector.innerHTML += `<span class="dot" onclick="toSlide(${i + 1})"></span>`;
+async function setClassSelec(array1, array2) {
+  let charClass = document.getElementById("charClass");
+  let classPic = document.getElementById('classPic');
+  let classStats = document.getElementById('classStats');
+  array1 = array1.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
+  array2 = array2.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
+  for (let i = 0; i < array1.length; i++) {
+    charClass.innerHTML += `<option value="${array1[i].name}">${array2[i].name}</option>`;
   }
-  slidePics.innerHTML += `<a id="prev" onclick="changeSlide(-1)">&#10094;</a>
-                          <a id="next" onclick="changeSlide(1)">&#10095;</a>`
+  classPic.src = array1[0].src;
+  classPic.alt = `${array1[0].name} portrait`;
+  classStats.innerHTML = `<ul>
+                          <li>Hit points: ${array2[0].stats.hp}</li>
+                          <li>Strength: ${array2[0].stats.str}</li>
+                          <li>Constitution: ${array2[0].stats.con}</li>
+                          <li>Dexterity: ${array2[0].stats.dex}</li>
+                          <li>Intelligence: ${array2[0].stats.int}</li>
+                          <li>Wisdom: ${array2[0].stats.wis}</li>
+                          <li>Charisma: ${array2[0].stats.cha}</li>
+                          </ul>`
+  charClass.addEventListener('change', event => {
+    let pics = array1.find(pic => pic.name == event.target.value);
+    let s = array2.find(stat => stat.name == event.target.value)
+    classPic.src = pics.src;
+    classPic.alt = `${pics.name} portrait`;
+    classStats.innerHTML = `<ul>
+                            <li>Hit points: ${s.stats.hp}</li>
+                            <li>Strength: ${s.stats.str}</li>
+                            <li>Constitution: ${s.stats.con}</li>
+                            <li>Dexterity: ${s.stats.dex}</li>
+                            <li>Intelligence: ${s.stats.int}</li>
+                            <li>Wisdom: ${s.stats.wis}</li>
+                            <li>Charisma: ${s.stats.cha}</li>
+                            </ul>`
+  })
 }
 
 // Insert select input for races and backgrounds
@@ -275,21 +238,54 @@ async function setRaceAndBackSelec() {
   })
 }
 
-// Script to load on index.html
-if (window.location.pathname === "/index.html") {
-  let user;
-  let characters;
-  const profile = document.getElementById('profile');
-  await getDoc(currentUser).then(query => {
-    let username;
-    if (query.data().username != '') {
-      user = query.data().username;
-    } else {
-      user = query.data().name;
-    }
-    characters = query.data().characters;
-  })
-  
+// Create stats radar chart
+function createChart(charStats) {
+  const ctx = document.getElementById('statsChart');
+
+  const data = {
+    labels: [
+      'Strength',
+      'Constitution',
+      'Dexterity',
+      'Intelligence',
+      'Wisdom',
+      'Charisma'
+    ],
+    datasets: [{
+      label: 'Stats',
+      data: [charStats.str, charStats.con, charStats.dex, charStats.int, charStats.wis, charStats.cha],
+      fill: true,
+      backgroundColor: '#E9444520',
+      borderColor: '#A34C50',
+      pointBackgroundColor: '#4A2932',
+      pointBorderColor: '#E94445',
+      pointHoverBackgroundColor: '#CEC2AE',
+      pointHoverBorderColor: '#264C5E'
+    }]
+  };
+
+  const config = {
+    type: 'radar',
+    data: data,
+    options: {
+      elements: {
+        line: {
+          borderWidth: 3
+        }
+      },
+      scales: {
+        r: {
+            angleLines: {
+                display: false
+            },
+            suggestedMin: 0,
+            suggestedMax: 10
+        }
+      }
+    },
+  };
+
+  new Chart(ctx, config);
 }
 
 // Script to load on character.html
@@ -302,10 +298,9 @@ if (window.location.pathname === "/pages/character.html") {
   const form = document.getElementById('charForm');
   const charCreate = document.getElementById('charCreate');
   start.addEventListener('click', async () => {
-    start.classList.toggle('hide')
+    start.style = 'display:none'
     charCreate.classList.toggle('hide')
     setClassSelec(arrPic, arrStats);
-    showSlide(slideIndex);
     setRaceAndBackSelec();  
   });
   form.addEventListener('submit', async (event) => {
@@ -314,12 +309,12 @@ if (window.location.pathname === "/pages/character.html") {
     const charClass = event.target.charClass.value;
     const charRace = event.target.charRace.value;
     const charBack = event.target.charBack.value;
-    const fav = false;
+    let fav = false;
     if (event.target.favorite.checked) {
       fav = true;
       unFav();
     }
-    const stats = await getDoc(doc(db, 'baseStats', 'BARD')).then(query => {
+    const stats = await getDoc(doc(db, 'baseStats', charClass)).then(query => {
       return query.data();
     })
     const charHP = Number(stats.hp.slice(0, 2));
@@ -328,7 +323,7 @@ if (window.location.pathname === "/pages/character.html") {
         name: charName,
         class: {
           name: charClass, 
-          picture: await getDownloadURL(ref(classPicsRef, `bard.png`)) //${charClass.toLowerCase()}
+          picture: await getDownloadURL(ref(classPicsRef, `${charClass.toLowerCase()}.png`)) //${charClass.toLowerCase()}
         },
         race: charRace,
         background: charBack,
@@ -345,6 +340,7 @@ if (window.location.pathname === "/pages/character.html") {
         favorite: fav
       })
     })
+    window.location.pathname = '/index.html'
   })
 }
 
@@ -353,10 +349,73 @@ auth.onAuthStateChanged(async (user) => {
   if (user) {
     currentUser = doc(db, 'users', user.email);
     userLogged();
+    // Script to load on index.html
+    if (window.location.pathname === "/index.html") {
+      const profile = document.getElementById('profDiv');
+      const homeNav = document.getElementById('homeNav');
+      const home = document.getElementById('home');
+      home.style = 'display:none';
+      profile.classList.toggle('hide');
+      homeNav.innerHTML = 'Profile'
+      let username;
+      let characters;
+      const favChar = document.getElementById('favChar');
+      const listInfo = document.getElementById('listInfo');
+      await getDoc(currentUser).then(query => {
+        username = query.data().name; 
+        characters = query.data().characters;
+      })
+      let mainChar = characters.find(char => char.favorite == true ? char : null);
+      if (mainChar == null) {
+        let num = Math.floor(Math.random()*characters.length);
+        mainChar = characters[num];
+      }
+      favChar.innerHTML = `<div id="imgAndName">
+                          <h1>Welcome<br>${username}</h1>
+                          <h1>${mainChar.name}</h1>
+                          <img src="${mainChar.class.picture}" alt="${mainChar.class.name} portrait">
+                          </div>
+                          <div id="charInfo">
+                          <h2>Class: ${mainChar.class.name}</h2>
+                          <h2>Race: ${mainChar.race}</h2>
+                          <h2>Hit points: ${mainChar.stats.hp}</h2>
+                          <span>Set as favorite</span>
+                          <button><img src="./assets/fav.png"></button>
+                          <div id="statsDiv">
+                          <canvas id="statsChart"></canvas>
+                          </div>
+                          </div>`
+      createChart(mainChar.stats);
+      characters = characters.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0))
+      for (let char of characters) {
+        listInfo.innerHTML += `<tr>
+                              <td>${char.name}</td>
+                              <td>${char.class.name}</td>
+                              <td>${char.race}</td>
+                              <td>${char.date}</td>
+                              </tr>`
+      }
+    }
+    if (window.location.pathname === "/pages/character.html") {
+      const start = document.getElementById('start');
+      start.classList.toggle('hide')
+      const sect = document.getElementById('noUserChar');
+      sect.style = 'display:none';
+    }
     console.log("Logged user");
   } else {
     currentUser = null;
     noUser();
+    if (window.location.pathname === "/index.html") {
+      const homeNav = document.getElementById('homeNav');
+      homeNav.innerHTML = 'Home'
+      const homeDiv = document.getElementById('homeDiv');
+      homeDiv.classList.toggle('hide');
+    }
+    if (window.location.pathname === "/pages/character.html") {
+      const noUserChar = document.getElementById('noUserChar');
+      noUserChar.classList.toggle('hide')
+    }
     console.log("No logged user");
   }
 });

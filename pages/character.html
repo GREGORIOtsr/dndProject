@@ -26,36 +26,40 @@
   <body>
     <header>
       <section>
-        <button id="navButton"></button>
-        <button id="themeToggle"></button>
-        <!-- Light/Dark theme toggle -->
-        <aside id="navegation">
-          <a href="../index.html" id="homeNav">Home</a>
-          <!-- Home/Profile page -->
-          <a href="#">Character creation</a>
-          <a href="./classes.html">Classes</a>
-          <a href="./races.html">Races</a>
-          <a href="./backgrounds.html">Backgrounds</a>
-          <a href="./feats.html">Feats</a>
-          <a href="./documents.html">Documents</a>
-        </aside>
-        <button id="signIn">Sign In</button>
+        <button id="navButton"><img src="../assets/nav.png" alt="Navigation icon"></button>
+        <!-- <button id="themeToggle"></button> Light/Dark theme toggle -->
+        <div id="navDiv" class="hide">
+          <aside id="navegation">
+            <a href="#" id="homeNav">Home</a> <!-- Home/Profile page -->
+            <a href="./pages/character.html">Character creation</a>
+            <a href="./pages/classes.html">Classes</a>
+            <a href="./pages/races.html">Races</a>
+            <a href="./pages/backgrounds.html">Backgrounds</a>
+            <a href="./pages/feats.html">Feats</a>
+            <a href="./pages/documents.html">Documents</a>
+          </aside>
+         </div>
+        <button id="signIn" class="fade">Sign In</button>
       </section>
     </header>
 
     <main>
-      <section id="noUserChar" class="hide">
+      <section id="noUserChar" class="hide fade">
         <h1>You have to Sign In to access character creation</h1>
         <button id="signUp">Sign In</button>
       </section>
       <button id="start" class="hide">Start</button>
-      <section id="charCreate" class="hide">
+      <section id="charCreate" class="hide fade">
         <form id="charForm">
-          <h2>Select class</h2>
-          <div id="slidePics"></div>
-          <div id="dotSelector"></div>
-          <label for="charName">Character's name</label>
-          <input type="text" id="charName" name="charName" required />
+          <label id="nameLabel" for="charName">Character's name</label>
+          <input type="text" id="charName" name="charName" required/>
+          <div id="classSelector">
+            <label for="charClass">Select class</label>
+            <select name="charClass" id="charClass"></select>
+            <img id="classPic" src="" alt="portrait">
+            <h2>STATS</h2>
+            <div id="classStats"></div>
+          </div>
           <div id="raceSelector">
             <label for="charRace">Select race</label>
             <select name="charRace" id="charRace"></select>
@@ -89,6 +93,7 @@
       </section>
     </footer>
 
+    
     <script src="../script.js" type="module"></script>
   </body>
 </html>
