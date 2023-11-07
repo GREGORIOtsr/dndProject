@@ -44,10 +44,33 @@
     </header>
 
     <main>
-        <section>
-            <h1>You have to Sign In to access character creation</h1>
-            <button>Sign In</button>
-        </section>
+      <section id="noUserChar" class="hide">
+        <h1>You have to Sign In to access character creation</h1>
+        <button id="signUp">Sign In</button>
+      </section>
+      <button id="start" class="hide">Start</button>
+      <section id="charCreate" class="hide">
+        <form id="charForm">
+          <h2>Select class</h2>
+          <div id="slidePics"></div>
+          <div id="dotSelector"></div>
+          <label for="charName">Character's name</label>
+          <input type="text" id="charName" name="charName" required />
+          <div id="raceSelector">
+            <label for="charRace">Select race</label>
+            <select name="charRace" id="charRace"></select>
+            <p id="raceDesc"></p>
+          </div>
+          <div id="backSelector">
+            <label for="charBack">Select background</label>
+            <select name="charBack" id="charBack"></select>
+            <p id="backDesc"></p>
+          </div>
+          <label for="favorite">Set as Main Character</label>
+          <input type="checkbox" name="favorite" id="favorite">
+          <input type="submit" id="submit" value="Submit">
+        </form>
+      </section>
     </main>
 
     <footer>
@@ -66,6 +89,6 @@
       </section>
     </footer>
 
-    <script src="./script.js"></script>
+    <script src="../script.js" type="module"></script>
   </body>
 </html>
