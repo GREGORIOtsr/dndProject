@@ -115,6 +115,11 @@ function signUserOut() {
     });
 }
 
+// Check current page
+function checkPage(route, title) {
+  return (window.location.pathname === route || document.title === title);
+}
+
 // Change page if no user logged in
 function noUser() {
   const signInButton = document.getElementById("signIn");
@@ -288,8 +293,15 @@ function createChart(charStats) {
   new Chart(ctx, config);
 }
 
+// Nav button event
+document.getElementById('navButton').addEventListener('click', () => {
+  const navDiv = document.getElementById('navDiv');
+  navDiv.classList.toggle('navSlideIn');
+  navDiv.classList.toggle('hide');
+})
+
 // Script to load on character.html
-if (window.location.pathname === "/pages/character.html") {
+if (checkPage('./pages/character.html', "Character creation")) {
   let arrPic = [];
   let arrStats = [];
   getPics(arrPic);
@@ -350,7 +362,7 @@ auth.onAuthStateChanged(async (user) => {
     currentUser = doc(db, 'users', user.email);
     userLogged();
     // Script to load on index.html
-    if (window.location.pathname === "/index.html") {
+    if (checkPage('./index.html', "Home")) {
       const profile = document.getElementById('profDiv');
       const homeNav = document.getElementById('homeNav');
       const home = document.getElementById('home');
@@ -396,7 +408,7 @@ auth.onAuthStateChanged(async (user) => {
                               </tr>`
       }
     }
-    if (window.location.pathname === "/pages/character.html") {
+    if (checkPage('./pages/character.html', "Character creation")) {
       const start = document.getElementById('start');
       start.classList.toggle('hide')
       const sect = document.getElementById('noUserChar');
@@ -406,75 +418,18 @@ auth.onAuthStateChanged(async (user) => {
   } else {
     currentUser = null;
     noUser();
-    if (window.location.pathname === "/index.html") {
+    if (checkPage('./index.html', "Home")) {
       const homeNav = document.getElementById('homeNav');
       homeNav.innerHTML = 'Home'
       const homeDiv = document.getElementById('homeDiv');
       homeDiv.classList.toggle('hide');
     }
-    if (window.location.pathname === "/pages/character.html") {
+    if (checkPage('./pages/character.html', "Character creation")) {
       const noUserChar = document.getElementById('noUserChar');
+      const start = document.getElementById('start')
       noUserChar.classList.toggle('hide')
+      start.style = 'display:none'
     }
     console.log("No logged user");
   }
 });
-
-/* let obj = {
-  name: '',
-  class: {
-    name: '',
-    picture: 'url'
-  },
-  race: '',
-  background: '',
-  weapons: [{
-    name: '',
-    icon: 'url'
-  }],
-  armor: {
-    name: '',
-    icon: 'url'
-  },
-  spells: [],
-  stats: {
-    hp: 0, // Hit points
-    str: 0, // Strenght
-    con: 0, // Constitution
-    dex: 0, // Dexterity
-    int: 0, // Intelligence
-    wis: 0, // Wisdom
-    cha: 0 // Charisma
-  },
-  date: ''
-} */
-
-/* `<img src="${class.picture}" alt="${class.name} image" />
-<div>
-  <h2>${name}</h2>
-  <h4>Set as favorite</h4>
-  <h4>Class: ${class.name}</h4>
-  <h4>Race: ${race}</h4>
-  <h4>Background: ${background}</h4>
-  <h4>Feats:</h4>
-  -- List
-  <h4>Weapons</h4>
-  -- Icons with name below
-  <h4>Armor:</h4>
-  -- Icon with name below
-  <h4>Spells:</h4>
-  -- List
-  <h4>Stats:</h4>
-  -- Chart
-</div>` */
-
-/* `<tr>
-  <td>${name}</td>
-  <td>${class.name}</td>
-  <td>${race}<td>
-  <td>${date}</td>
-</tr>` */
-
-{
-  /* <span class="dot" onclick="currentSlide(i)"></span> */
-}
