@@ -11,11 +11,15 @@ A personal project about DnD where you can get information, explore the world an
 
 ## Instructions ##
 
-To get started on character creation you first have to sign up through a Google account.
-Then, inside the navigation bar, go to character creation.
+To get started on character creation you first have to sign up through a Google account, then, inside the navigation bar, go to character creation.
+
 Right now you can choose a name, class with base stats, race and background for your character (More to be added in the future), you can also set the character as your main character if you wish.
+
 Once you have selected all fields click on submit and your character will be saved on the firebase storage.
+
 You can see your favorite character and a list of all your other characters on your profile.
+
+[**GitHub Page**](https://gregoriotsr.github.io/dndProject/)
 
 -------------------------------------------------------------------------------
 
@@ -31,4 +35,5 @@ You can see your favorite character and a list of all your other characters on y
 # WIP #
 
 This project is still a work in progess, I'll be adding new updates in a changelog section.
+
 Any suggestions are well received!
