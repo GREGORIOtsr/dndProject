@@ -1,4 +1,4 @@
-/* Fetch links */
+//#region Fetch links
 // Classes --> "https://api.open5e.com/v1/classes/"
 // Races --> "https://api.open5e.com/v1/races/"
 // Backgrounds --> "https://api.open5e.com/v1/backgrounds/"
@@ -7,7 +7,9 @@
 // Armor --> "https://api.open5e.com/v1/armor/"
 // Spells --> "https://api.open5e.com/v1/spells/"
 // Spell list --> "https://api.open5e.com/v1/spelllist/?format=api"
+//#endregion
 
+//#region FIRESTORE imports and init
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.6/firebase-app.js";
 import {
   getAuth,
@@ -62,11 +64,9 @@ let currentUser;
 const storage = getStorage();
 const pfpRef = ref(storage, "profilePictures");
 const classPicsRef = ref(storage, "classes");
+//#endregion
 
-let slideIndex = 1;
-
-// Functions ///////////////////////////////////////////////////////////////
-
+//#region Functions
 // Sign In with Google
 async function googleSign() {
   await signInWithPopup(auth, provider)
@@ -130,14 +130,14 @@ function noUser() {
   
   if (checkPage('./index.html', "Home")) {
     const homeDiv = document.getElementById('homeDiv');
-    homeDiv.style = 'display:'
+    homeDiv.classList.remove('hide')
     const profile = document.getElementById('profDiv');
-    profile.style = 'display:none'
+    profile.classList.add('hide')
   }
 
   if (checkPage('./pages/character.html', "Character creation")) {
     const sect = document.getElementById('noUserChar');
-    sect.style = 'display:';
+    sect.classList.remove('hide')
     const start = document.getElementById('start');
     start.style = 'display:none'
   }
@@ -153,14 +153,14 @@ function userLogged() {
   
   if (checkPage('./index.html', "Home")) {
     const homeDiv = document.getElementById('homeDiv');
-    homeDiv.style = 'display:none';
+    homeDiv.classList.add('hide')
     const profile = document.getElementById('profDiv');
-    profile.style = 'display:'
+    profile.classList.remove('hide')
   }
 
   if (checkPage('./pages/character.html', "Character creation")) {
     const sect = document.getElementById('noUserChar');
-    sect.style = 'display:none';
+    sect.classList.add('hide')
     const start = document.getElementById('start');
     start.style = 'display:'
   }
@@ -185,6 +185,9 @@ const getStats = async function(arr) {
   })
 }
 
+// Favorite character
+// WIP
+
 // Set all characters as not favorite
 async function unFav() {
   await getDoc(currentUser).then(async (query) => {
@@ -198,8 +201,31 @@ async function unFav() {
   })
 }
 
-// Favorite character
-
+// Show character
+async function showChar(char) {
+  let characters;
+  const favChar = document.getElementById('favChar');
+  await getDoc(currentUser).then(query => {
+    characters = query.data().characters;
+  })
+  let c = characters.find(c => c.name == char);
+  favChar.innerHTML = `<div id="imgAndName">
+                          <h1>${c.name}</h1> 
+                          <img src="${c.class.picture}" alt="${c.class.name} portrait">
+                          </div>
+                          <div id="charInfo">
+                          <h2>Class: ${c.class.name}</h2>
+                          <h2>Race: ${c.race}</h2>
+                          <h2>Background: ${c.background}</h2>
+                          <h2>Hit points: ${c.stats.hp}</h2>
+                          <span>Set as favorite</span>
+                          <button><img src="./assets/fav.png"></button>
+                          <div id="statsDiv">
+                          <canvas id="statsChart"></canvas>
+                          </div>
+                          </div>`
+  createChart(c.stats);
+}
 
 // Insert class selector on html
 async function setClassSelec(array1, array2) {
@@ -323,15 +349,63 @@ function createChart(charStats) {
   new Chart(ctx, config);
 }
 
-// Nav button event
-document.getElementById('navButton').addEventListener('click', () => {
-  const navDiv = document.getElementById('navDiv');
-  navDiv.classList.toggle('navSlideIn');
-  navDiv.classList.toggle('hide');
-})
+// Create table
+function createTable(char) {
+  for (let i = 0; i < char.length; i++) {
+    let id;
+    listInfo.innerHTML += `<tr>
+                          <td><a id="${char[i].name}" class="changeChar">${char[i].name}</a></td>
+                          <td>${char[i].class.name}</td>
+                          <td>${char[i].race}</td>
+                          <td>${char[i].date}</td>
+                          </tr>`;
+    id = document.getElementById(char[i].name);
+    id.addEventListener('click', () => {
+      showChar(char[i].name)
+    });
+  }
+}
 
-// Script to load on character.html
-if (checkPage('./pages/character.html', "Character creation")) {
+// Set profile page
+async function setProfile() {
+  let username;
+  let characters;
+  const favChar = document.getElementById('favChar');
+  const listInfo = document.getElementById('listInfo');
+  await getDoc(currentUser).then(query => {
+    username = query.data().name; 
+    characters = query.data().characters;
+  }).then(res => {
+    let mainChar = characters.find(char => char.favorite == true ? char : null);
+    if (mainChar == null) {
+      let num = Math.floor(Math.random()*characters.length);
+      mainChar = characters[num];
+    }
+    favChar.innerHTML = `<div id="imgAndName">
+                        <h1>Welcome<br>${username}</h1>
+                        <h1>${mainChar.name}</h1>
+                        <img src="${mainChar.class.picture}" alt="${mainChar.class.name} portrait">
+                        </div>
+                        <div id="charInfo">
+                        <h2>Class: ${mainChar.class.name}</h2>
+                        <h2>Race: ${mainChar.race}</h2>
+                        <h2>Background: ${mainChar.background}</h2>
+                        <h2>Hit points: ${mainChar.stats.hp}</h2>
+                        <span>Set as favorite</span>
+                        <button><img src="./assets/fav.png"></button>
+                        <div id="statsDiv">
+                        <canvas id="statsChart"></canvas>
+                        </div>
+                        </div>`
+    createChart(mainChar.stats);
+    let char = characters.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
+    createTable(char);
+    tableSort();
+  })
+}
+
+// Set character creation page
+async function setCreate() {
   let arrPic = [];
   let arrStats = [];
   getPics(arrPic);
@@ -341,8 +415,7 @@ if (checkPage('./pages/character.html', "Character creation")) {
   const charCreate = document.getElementById('charCreate');
   start.addEventListener('click', async () => {
     start.style = 'display:none'
-    charCreate.classList.toggle('hide')
-    charCreate.style = 'display:'
+    charCreate.classList.remove('hide')
     setClassSelec(arrPic, arrStats);
     setRaceAndBackSelec();  
   });
@@ -383,9 +456,85 @@ if (checkPage('./pages/character.html', "Character creation")) {
         favorite: fav
       })
     })
-    window.location.pathname = '/index.html'
+    window.location = '/index.html';
+    // window.location = 'https://gregoriotsr.github.io/dndProject/';
   })
 }
+
+// Add sort events to table
+async function tableSort() {
+  let nameNum, classNum, raceNum, dateNum = 0;
+  const names = document.querySelector('thead tr th:nth-child(1)');
+  const classes = document.querySelector('thead tr th:nth-child(2)');
+  const races = document.querySelector('thead tr th:nth-child(3)');
+  const dates = document.querySelector('thead tr th:nth-child(4)');
+  const listInfo = document.getElementById('listInfo');
+  let characters;
+  await getDoc(currentUser).then(query => {
+    characters = query.data().characters;
+  }).then(res => {
+    names.addEventListener('click', () => {
+      if (nameNum == 0) {
+        nameNum = 1;
+        let char = characters.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
+        listInfo.innerHTML = '';
+        createTable(char);
+      } else {
+        nameNum = 0;
+        let char = characters.sort((a, b) => (a.name < b.name) ? 1 : ((b.name < a.name) ? -1 : 0));
+        listInfo.innerHTML = '';
+        createTable(char);
+      }
+    })
+    classes.addEventListener('click', () => {
+      if (classNum == 0) {
+        classNum = 1;
+        let char = characters.sort((a, b) => (a.class.name > b.class.name) ? 1 : ((b.class.name > a.class.name) ? -1 : 0));
+        listInfo.innerHTML = '';
+        createTable(char);
+      } else {
+        classNum = 0;
+        let char = characters.sort((a, b) => (a.class.name < b.name) ? 1 : ((b.class.name < a.class.name) ? -1 : 0));
+        listInfo.innerHTML = '';
+        createTable(char);
+      }
+    })
+    races.addEventListener('click', () => {
+      if (raceNum == 0) {
+        raceNum = 1;
+        let char = characters.sort((a, b) => (a.race > b.race) ? 1 : ((b.race > a.race) ? -1 : 0));
+        listInfo.innerHTML = '';
+        createTable(char);
+      } else {
+        raceNum = 0;
+        let char = characters.sort((a, b) => (a.race < b.race) ? 1 : ((b.race < a.race) ? -1 : 0));
+        listInfo.innerHTML = '';
+        createTable(char);
+      }
+    })
+    dates.addEventListener('click', () => {
+      if (dateNum == 0) {
+        dateNum = 1;
+        let char = characters.sort((a, b) => new Date(b.date) - new Date(a.date));
+        listInfo.innerHTML = '';
+        createTable(char);
+      } else {
+        dateNum = 0;
+        let char = characters.sort((a, b) => new Date(a.date) - new Date(b.date));
+        listInfo.innerHTML = '';
+        createTable(char);
+      }
+    })
+  })
+}
+//#endregion
+
+// Nav button event
+document.getElementById('navButton').addEventListener('click', () => {
+  const navDiv = document.getElementById('navDiv');
+  navDiv.classList.toggle('navSlideIn');
+  navDiv.classList.toggle('hide');
+});
 
 //Observe the user's state
 auth.onAuthStateChanged(async (user) => {
@@ -394,44 +543,10 @@ auth.onAuthStateChanged(async (user) => {
     userLogged();
     // Script to load on index.html
     if (checkPage('./index.html', "Home")) {
-      let username;
-      let characters;
-      const favChar = document.getElementById('favChar');
-      const listInfo = document.getElementById('listInfo');
-      await getDoc(currentUser).then(query => {
-        username = query.data().name; 
-        characters = query.data().characters;
-      })
-      let mainChar = characters.find(char => char.favorite == true ? char : null);
-      if (mainChar == null) {
-        let num = Math.floor(Math.random()*characters.length);
-        mainChar = characters[num];
-      }
-      favChar.innerHTML = `<div id="imgAndName">
-                          <h1>Welcome<br>${username}</h1>
-                          <h1>${mainChar.name}</h1>
-                          <img src="${mainChar.class.picture}" alt="${mainChar.class.name} portrait">
-                          </div>
-                          <div id="charInfo">
-                          <h2>Class: ${mainChar.class.name}</h2>
-                          <h2>Race: ${mainChar.race}</h2>
-                          <h2>Hit points: ${mainChar.stats.hp}</h2>
-                          <span>Set as favorite</span>
-                          <button><img src="./assets/fav.png"></button>
-                          <div id="statsDiv">
-                          <canvas id="statsChart"></canvas>
-                          </div>
-                          </div>`
-      createChart(mainChar.stats);
-      characters = characters.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0))
-      for (let char of characters) {
-        listInfo.innerHTML += `<tr>
-                              <td>${char.name}</td>
-                              <td>${char.class.name}</td>
-                              <td>${char.race}</td>
-                              <td>${char.date}</td>
-                              </tr>`
-      }
+      await setProfile();
+    }
+    if (checkPage('./pages/character.html', "Character creation")) {
+      await setCreate();
     }
     console.log("Logged user");
   } else {

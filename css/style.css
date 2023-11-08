@@ -58,7 +58,7 @@
 * {
     font-family: 'Nanum Myeongjo', serif;
     font-size: 15px;
-    max-width: 100vw;
+    max-width: calc(100vw - (100vw - 100%));
     box-sizing: border-box;
     scroll-behavior: smooth;
 }
@@ -140,6 +140,15 @@ main {
     flex: 1;    
 }
 
+main h1, main p {
+    margin: 30px 0 0 30px;
+}
+
+.changeChar {
+    color: var(--redwood);
+    cursor: pointer;
+}
+
 #home {
     display: flex;
     flex-flow: column wrap;
@@ -199,7 +208,7 @@ main {
     text-shadow: 0 3px 5px #0006;
 }
 
-#imgAndName h1:nth-child(2) {
+#imgAndName h1:nth-last-child(2) {
     font-family: 'Cinzel', serif;
     font-size: 3rem;
     color: var(--redwood);
@@ -289,6 +298,7 @@ main {
 }
 
 #charName {
+    text-align: center;
     font-size: 1.1rem;
     width: 50vw;
     align-self: center;
@@ -355,3 +365,49 @@ footer a {
     text-decoration: none;
     margin-left: 5px;
 }
+
+@media only screen 
+  and (min-device-width: 768px) 
+  and (max-device-width: 1024px) {
+
+  }
+
+@media only screen 
+  and (min-device-width: 1024px) 
+  and (max-device-width: 1600px) {
+    * {
+        font-size: 25px;
+    }
+
+    #home img {
+        align-self: center;
+        width: 80vw;
+    }
+
+    #favChar {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+        margin: 40px 0;
+    }
+
+    #charInfo {
+        margin: 70px 100px 0 300px;
+    }
+
+    #charList th {
+        padding: 15px;
+        border: 2px solid var(--redwood);
+    }
+    
+    #charList td {
+        padding: 20px 15px;
+        border: 2px solid var(--redwood);   
+    }
+
+    #start {
+        display: flex;
+        align-self: center;
+        margin: 200px auto 0;
+    }
+  }

@@ -1,4 +1,4 @@
-# Dungeons & Dragons page project #
+# Dungeons & Dragons personal project #
 
 ![](./assets/logo.png)
 
