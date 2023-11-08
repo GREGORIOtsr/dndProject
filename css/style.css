@@ -30,15 +30,15 @@
 
 @keyframes navSlideIn {
     0% {
-        width: 0;
+        right: 100vw;
     }
     100% {
-        width: 100%;
+        right: 0;
     }
 }
 
 .navSlideIn {
-    animation: navSlideIn 1s;
+    animation: navSlideIn 0.5s;
 }
 
 @keyframes navSlideOut {

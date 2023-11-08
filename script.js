@@ -115,6 +115,11 @@ function signUserOut() {
     });
 }
 
+// Check current page
+function checkPage(route, title) {
+  return (window.location.pathname === route || document.title === title);
+}
+
 // Change page if no user logged in
 function noUser() {
   const signInButton = document.getElementById("signIn");
@@ -122,13 +127,43 @@ function noUser() {
   signInButton.innerHTML = "Sign In";
   signInButton.addEventListener("click", googleSign);
   signUpButton.addEventListener("click", googleSign);
+  
+  if (checkPage('./index.html', "Home")) {
+    const homeDiv = document.getElementById('homeDiv');
+    homeDiv.style = 'display:'
+    const profile = document.getElementById('profDiv');
+    profile.style = 'display:none'
+  }
+
+  if (checkPage('./pages/character.html', "Character creation")) {
+    const sect = document.getElementById('noUserChar');
+    sect.style = 'display:';
+    const start = document.getElementById('start');
+    start.style = 'display:none'
+  }
 }
 
 // Change page if user logged
 function userLogged() {
   const signInButton = document.getElementById("signIn");
+  const homeNav = document.getElementById('homeNav');
   signInButton.innerHTML = "Sign Out";
   signInButton.addEventListener("click", signUserOut);
+  homeNav.innerHTML = 'Profile'
+  
+  if (checkPage('./index.html', "Home")) {
+    const homeDiv = document.getElementById('homeDiv');
+    homeDiv.style = 'display:none';
+    const profile = document.getElementById('profDiv');
+    profile.style = 'display:'
+  }
+
+  if (checkPage('./pages/character.html', "Character creation")) {
+    const sect = document.getElementById('noUserChar');
+    sect.style = 'display:none';
+    const start = document.getElementById('start');
+    start.style = 'display:'
+  }
 }
 
 // Get classes urls from cloud storage
@@ -288,8 +323,15 @@ function createChart(charStats) {
   new Chart(ctx, config);
 }
 
+// Nav button event
+document.getElementById('navButton').addEventListener('click', () => {
+  const navDiv = document.getElementById('navDiv');
+  navDiv.classList.toggle('navSlideIn');
+  navDiv.classList.toggle('hide');
+})
+
 // Script to load on character.html
-if (window.location.pathname === "/pages/character.html") {
+if (checkPage('./pages/character.html', "Character creation")) {
   let arrPic = [];
   let arrStats = [];
   getPics(arrPic);
@@ -300,6 +342,7 @@ if (window.location.pathname === "/pages/character.html") {
   start.addEventListener('click', async () => {
     start.style = 'display:none'
     charCreate.classList.toggle('hide')
+    charCreate.style = 'display:'
     setClassSelec(arrPic, arrStats);
     setRaceAndBackSelec();  
   });
@@ -350,13 +393,7 @@ auth.onAuthStateChanged(async (user) => {
     currentUser = doc(db, 'users', user.email);
     userLogged();
     // Script to load on index.html
-    if (window.location.pathname === "/index.html") {
-      const profile = document.getElementById('profDiv');
-      const homeNav = document.getElementById('homeNav');
-      const home = document.getElementById('home');
-      home.style = 'display:none';
-      profile.classList.toggle('hide');
-      homeNav.innerHTML = 'Profile'
+    if (checkPage('./index.html', "Home")) {
       let username;
       let characters;
       const favChar = document.getElementById('favChar');
@@ -396,85 +433,10 @@ auth.onAuthStateChanged(async (user) => {
                               </tr>`
       }
     }
-    if (window.location.pathname === "/pages/character.html") {
-      const start = document.getElementById('start');
-      start.classList.toggle('hide')
-      const sect = document.getElementById('noUserChar');
-      sect.style = 'display:none';
-    }
     console.log("Logged user");
   } else {
     currentUser = null;
     noUser();
-    if (window.location.pathname === "/index.html") {
-      const homeNav = document.getElementById('homeNav');
-      homeNav.innerHTML = 'Home'
-      const homeDiv = document.getElementById('homeDiv');
-      homeDiv.classList.toggle('hide');
-    }
-    if (window.location.pathname === "/pages/character.html") {
-      const noUserChar = document.getElementById('noUserChar');
-      noUserChar.classList.toggle('hide')
-    }
     console.log("No logged user");
   }
 });
-
-/* let obj = {
-  name: '',
-  class: {
-    name: '',
-    picture: 'url'
-  },
-  race: '',
-  background: '',
-  weapons: [{
-    name: '',
-    icon: 'url'
-  }],
-  armor: {
-    name: '',
-    icon: 'url'
-  },
-  spells: [],
-  stats: {
-    hp: 0, // Hit points
-    str: 0, // Strenght
-    con: 0, // Constitution
-    dex: 0, // Dexterity
-    int: 0, // Intelligence
-    wis: 0, // Wisdom
-    cha: 0 // Charisma
-  },
-  date: ''
-} */
-
-/* `<img src="${class.picture}" alt="${class.name} image" />
-<div>
-  <h2>${name}</h2>
-  <h4>Set as favorite</h4>
-  <h4>Class: ${class.name}</h4>
-  <h4>Race: ${race}</h4>
-  <h4>Background: ${background}</h4>
-  <h4>Feats:</h4>
-  -- List
-  <h4>Weapons</h4>
-  -- Icons with name below
-  <h4>Armor:</h4>
-  -- Icon with name below
-  <h4>Spells:</h4>
-  -- List
-  <h4>Stats:</h4>
-  -- Chart
-</div>` */
-
-/* `<tr>
-  <td>${name}</td>
-  <td>${class.name}</td>
-  <td>${race}<td>
-  <td>${date}</td>
-</tr>` */
-
-{
-  /* <span class="dot" onclick="currentSlide(i)"></span> */
-}
