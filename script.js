@@ -127,13 +127,43 @@ function noUser() {
   signInButton.innerHTML = "Sign In";
   signInButton.addEventListener("click", googleSign);
   signUpButton.addEventListener("click", googleSign);
+  
+  if (checkPage('./index.html', "Home")) {
+    const homeDiv = document.getElementById('homeDiv');
+    homeDiv.style = 'display:'
+    const profile = document.getElementById('profDiv');
+    profile.style = 'display:none'
+  }
+
+  if (checkPage('./pages/character.html', "Character creation")) {
+    const sect = document.getElementById('noUserChar');
+    sect.style = 'display:';
+    const start = document.getElementById('start');
+    start.style = 'display:none'
+  }
 }
 
 // Change page if user logged
 function userLogged() {
   const signInButton = document.getElementById("signIn");
+  const homeNav = document.getElementById('homeNav');
   signInButton.innerHTML = "Sign Out";
   signInButton.addEventListener("click", signUserOut);
+  homeNav.innerHTML = 'Profile'
+  
+  if (checkPage('./index.html', "Home")) {
+    const homeDiv = document.getElementById('homeDiv');
+    homeDiv.style = 'display:none';
+    const profile = document.getElementById('profDiv');
+    profile.style = 'display:'
+  }
+
+  if (checkPage('./pages/character.html', "Character creation")) {
+    const sect = document.getElementById('noUserChar');
+    sect.style = 'display:none';
+    const start = document.getElementById('start');
+    start.style = 'display:'
+  }
 }
 
 // Get classes urls from cloud storage
@@ -312,6 +342,7 @@ if (checkPage('./pages/character.html', "Character creation")) {
   start.addEventListener('click', async () => {
     start.style = 'display:none'
     charCreate.classList.toggle('hide')
+    charCreate.style = 'display:'
     setClassSelec(arrPic, arrStats);
     setRaceAndBackSelec();  
   });
@@ -363,12 +394,6 @@ auth.onAuthStateChanged(async (user) => {
     userLogged();
     // Script to load on index.html
     if (checkPage('./index.html', "Home")) {
-      const profile = document.getElementById('profDiv');
-      const homeNav = document.getElementById('homeNav');
-      const home = document.getElementById('home');
-      home.style = 'display:none';
-      profile.classList.toggle('hide');
-      homeNav.innerHTML = 'Profile'
       let username;
       let characters;
       const favChar = document.getElementById('favChar');
@@ -408,28 +433,10 @@ auth.onAuthStateChanged(async (user) => {
                               </tr>`
       }
     }
-    if (checkPage('./pages/character.html', "Character creation")) {
-      const start = document.getElementById('start');
-      start.classList.toggle('hide')
-      const sect = document.getElementById('noUserChar');
-      sect.style = 'display:none';
-    }
     console.log("Logged user");
   } else {
     currentUser = null;
     noUser();
-    if (checkPage('./index.html', "Home")) {
-      const homeNav = document.getElementById('homeNav');
-      homeNav.innerHTML = 'Home'
-      const homeDiv = document.getElementById('homeDiv');
-      homeDiv.classList.toggle('hide');
-    }
-    if (checkPage('./pages/character.html', "Character creation")) {
-      const noUserChar = document.getElementById('noUserChar');
-      const start = document.getElementById('start')
-      noUserChar.classList.toggle('hide')
-      start.style = 'display:none'
-    }
     console.log("No logged user");
   }
 });
